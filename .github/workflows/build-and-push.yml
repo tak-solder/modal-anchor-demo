@@ -12,17 +12,6 @@ on:
       - pnpm-lock.yaml
       - '.node-version'
       - vite.config.ts
-  push:
-    branches:
-      - main
-    paths:
-      - .github/workflows/build-and-push.yml
-      - index.html
-      - 'src/**'
-      - docs
-      - pnpm-lock.yaml
-      - '.node-version'
-      - vite.config.ts
 
 jobs:
   build:
@@ -65,18 +54,9 @@ jobs:
           git status --porcelain docs | grep -q "^" && echo "changes=true" >> $GITHUB_OUTPUT || echo "changes=false" >> $GITHUB_OUTPUT
 
       - name: Commit and push changes if any
-        if: steps.check_changes.outputs.changes == 'true' && github.event_name == 'pull_request'
+        if: steps.check_changes.outputs.changes == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Update build artifacts in docs directory" docs
           git push origin ${{ github.head_ref || github.ref_name }}
-
-      - name: Commit and create pull_request changes if any
-        if: steps.check_changes.outputs.changes == 'true' && github.event_name == 'push'
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -m "Update build artifacts in docs directory" docs
-          git push -f origin ${{ github.head_ref || github.ref_name }}:build-and-push
-          gh pr create --base main --head build-and-push --title "Update build artifacts in docs directory" --body "This PR updates the build artifacts in the docs directory." --reviewer tak-solder
