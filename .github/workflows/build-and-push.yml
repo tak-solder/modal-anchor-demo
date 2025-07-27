@@ -68,4 +68,4 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Update build artifacts in docs directory" docs
-          git push
+          git push origin HEAD:${github.head_ref || github.ref_name}
