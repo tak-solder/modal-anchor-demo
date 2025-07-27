@@ -80,19 +80,19 @@ function Modal({title, anchorText, href, blank, handleClose}: ModalProps) {
         console.debug('fire: handlePageHide - page is being restored from bfcache')
       }
     }
-    addEventListener('pagehide', handlePageHide)
+    window.addEventListener('pagehide', handlePageHide)
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
         console.debug('fire: handlePageShow - page is being restored from bfcache')
       }
     }
-    addEventListener('pageshow', handlePageShow)
+    window.addEventListener('pageshow', handlePageShow)
 
     return () => {
       console.debug('fire: Modal.cleanup')
-      removeEventListener('pagehide', handlePageHide)
-      removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('pagehide', handlePageHide)
+      window.removeEventListener('pageshow', handlePageShow)
     }
   }, [])
 
