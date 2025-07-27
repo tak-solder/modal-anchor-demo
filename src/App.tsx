@@ -43,7 +43,7 @@ function ModalButton({href, anchorText, blank}: ModalButtonProps) {
     console.debug('ModalButton.useEffect')
   }, [])
 
-  const title = blank ? "同一タブで遷移するモーダル" : "別タブで遷移するモーダル"
+  const title = blank ? "別タブで遷移" : "同一タブで遷移"
 
   return (
     <>
@@ -51,7 +51,7 @@ function ModalButton({href, anchorText, blank}: ModalButtonProps) {
         onClick={() => setIsOpen(true)}
         className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-300"
       >
-        {title}
+        モーダル内から{title}する場合
       </button>
 
       {isOpen && (
