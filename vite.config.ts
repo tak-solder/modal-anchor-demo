@@ -9,7 +9,13 @@ export default defineConfig({
     tailwindcss(),
   ],
   build: {
-    outDir: "docs"
+    outDir: "docs",
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        other: 'other.html'
+      },
+    }
   },
   base: "/modal-anchor-demo"
 })

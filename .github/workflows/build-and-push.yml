@@ -1,9 +1,28 @@
 name: Build Project and Commit Changes
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-and-push.yml
+      - index.html
+      - 'src/**'
+      - docs
+      - pnpm-lock.yaml
+      - '.node-version'
+      - vite.config.ts
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/build-and-push.yml
+      - index.html
+      - 'src/**'
+      - docs
+      - pnpm-lock.yaml
+      - '.node-version'
+      - vite.config.ts
 
 jobs:
   build:
@@ -14,6 +33,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -49,4 +70,4 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git commit -m "Update build artifacts in docs directory" docs
-          git push
+          git push origin ${{ github.head_ref || github.ref_name }}
