@@ -1,9 +1,28 @@
 name: Build Project and Commit Changes
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-and-push.yml
+      - index.html
+      - 'src/**'
+      - docs
+      - pnpm-lock.yaml
+      - '.node-version'
+      - vite.config.ts
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/build-and-push.yml
+      - index.html
+      - 'src/**'
+      - docs
+      - pnpm-lock.yaml
+      - '.node-version'
+      - vite.config.ts
 
 jobs:
   build:
