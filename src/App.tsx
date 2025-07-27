@@ -1,7 +1,26 @@
 import {useCallback, useEffect, useState} from 'react'
 import './App.css'
 
+type OptionType = 'click' | 'pagehide' | 'pageshow'
+
+const OPTIONS = [
+  {
+    label: 'aタグのclickイベントでモーダルを閉じる',
+    value: 'click' as OptionType,
+  },
+  {
+    label: 'pagehideイベントでモーダルを閉じる',
+    value: 'pagehide' as OptionType,
+  },
+  {
+    label: 'pageshowイベントでモーダルを閉じる',
+    value: 'pageshow' as OptionType,
+  },
+];
+
 export function App() {
+  const [closeActions, setCloseActions] = useState<OptionType[]>([]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
@@ -10,13 +29,43 @@ export function App() {
         </header>
 
         <div className="p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Contents</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">オプション</h2>
+          <ul className="space-y-2">
+            {OPTIONS.map(({label, value}) => (
+              <li key={value}>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="query"
+                    value={value}
+                    checked={closeActions.includes(value)}
+                    className="form-checkbox h-5 w-5 text-indigo-600 transition duration-150 ease-in-out"
+                    onChange={(event) => {
+                      const checked = event.target.checked;
+                      setCloseActions((prev) => {
+                        if (checked) {
+                          return [...prev, value];
+                        } else {
+                          return prev.filter((v) => v !== value);
+                        }
+                      });
+                    }}
+                  />
+                  <span className="ml-2 text-gray-700">{label}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="p-8">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">動作検証</h2>
           <ul className="space-y-4">
-            <li className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <ModalButton blank={false} />
+            <li>
+              <ModalButton blank={false} closeActions={closeActions}/>
             </li>
-            <li className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <ModalButton blank={true} />
+            <li>
+              <ModalButton blank={true}  closeActions={closeActions}/>
             </li>
           </ul>
         </div>
@@ -27,9 +76,10 @@ export function App() {
 
 type ModalButtonProps = {
   blank: boolean;
+  closeActions: OptionType[];
 }
 
-function ModalButton({blank}: ModalButtonProps) {
+function ModalButton({blank, closeActions}: ModalButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const handleClose = useCallback(() => {
@@ -43,13 +93,13 @@ function ModalButton({blank}: ModalButtonProps) {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-indigo-300 cursor-pointer"
       >
         モーダル内から{title}する場合
       </button>
 
       {isOpen && (
-          <Modal title={title} blank={blank} handleClose={handleClose} />
+          <Modal title={title} blank={blank} handleClose={handleClose} closeActions={closeActions} />
       )}
     </>
   )
@@ -59,28 +109,38 @@ type ModalProps = {
   title: string;
   blank: boolean;
   handleClose: () => void;
+  closeActions: OptionType[];
 }
 
-function Modal({title, blank, handleClose}: ModalProps) {
+function Modal({title, blank, handleClose, closeActions}: ModalProps) {
   console.debug('fire: Modal.render')
 
-  const handleAnchorClick = useCallback(() => {
-    console.debug('fire: Modal.handleAnchorClick')
+  const handleClickAnchor = useCallback(() => {
+    console.debug('fire: Modal.handleClickAnchor')
+    if (closeActions.includes('click')) {
+      handleClose();
+    }
   }, []);
 
   useEffect(() => {
-    console.debug('Modal.useEffect')
+    console.debug('fire: Modal.useEffect')
 
     const handlePageHide = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        console.debug('fire: handlePageHide - page is being restored from bfcache')
+        console.debug('fire: handlePageHide')
+        if (closeActions.includes('pagehide')) {
+          handleClose();
+        }
       }
     }
     window.addEventListener('pagehide', handlePageHide)
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        console.debug('fire: handlePageShow - page is being restored from bfcache')
+        console.debug('fire: handlePageShow')
+        if (closeActions.includes('pageshow')) {
+          handleClose();
+        }
       }
     }
     window.addEventListener('pageshow', handlePageShow)
@@ -123,7 +183,7 @@ function Modal({title, blank, handleClose}: ModalProps) {
           <div className="p-6">
             <a
               href="/modal-anchor-demo/other.html"
-              onClick={handleAnchorClick}
+              onClick={handleClickAnchor}
               target={blank ? "_blank" : "_self"}
               className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
               rel={blank ? "noopener noreferrer" : ""}
