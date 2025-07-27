@@ -70,19 +70,22 @@ function Modal({title, anchorText, href, blank, handleClose}: ModalProps) {
 
   const handleAnchorClick = useCallback(() => {
     console.debug('fire: Modal.handleAnchorClick')
-    handleClose()
   }, []);
 
   useEffect(() => {
     console.debug('Modal.useEffect')
 
-    const handlePageHide = () => {
-      console.debug('fire: handlePageHide')
+    const handlePageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        console.debug('fire: handlePageHide - page is being restored from bfcache')
+      }
     }
     addEventListener('pagehide', handlePageHide)
 
-    const handlePageShow = () => {
-      console.debug('fire:  handlePageShow')
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        console.debug('fire: handlePageShow - page is being restored from bfcache')
+      }
     }
     addEventListener('pageshow', handlePageShow)
 
