@@ -13,10 +13,10 @@ export function App() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-6">Contents</h2>
           <ul className="space-y-4">
             <li className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <ModalButton href="https://github.com/tak-solder/modal-anchor-demo" anchorText="GitHubリポジトリへのリンク" blank={false} />
+              <ModalButton blank={false} />
             </li>
             <li className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300">
-              <ModalButton href="https://handat.hatenablog.com" anchorText="handatのブログへのリンク" blank={true} />
+              <ModalButton blank={true} />
             </li>
           </ul>
         </div>
@@ -26,12 +26,10 @@ export function App() {
 }
 
 type ModalButtonProps = {
-  href: string;
-  anchorText: string;
   blank: boolean;
 }
 
-function ModalButton({href, anchorText, blank}: ModalButtonProps) {
+function ModalButton({blank}: ModalButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const handleClose = useCallback(() => {
@@ -51,21 +49,19 @@ function ModalButton({href, anchorText, blank}: ModalButtonProps) {
       </button>
 
       {isOpen && (
-          <Modal title={title} anchorText={anchorText} href={href} blank={blank} handleClose={handleClose} />
+          <Modal title={title} blank={blank} handleClose={handleClose} />
       )}
     </>
   )
 }
 
 type ModalProps = {
-  title: string
-  anchorText: string;
-  href: string;
+  title: string;
   blank: boolean;
   handleClose: () => void;
 }
 
-function Modal({title, anchorText, href, blank, handleClose}: ModalProps) {
+function Modal({title, blank, handleClose}: ModalProps) {
   console.debug('fire: Modal.render')
 
   const handleAnchorClick = useCallback(() => {
@@ -126,13 +122,13 @@ function Modal({title, anchorText, href, blank, handleClose}: ModalProps) {
           {/* Content */}
           <div className="p-6">
             <a
-              href={href}
+              href="/modal-anchor-demo/other.html"
               onClick={handleAnchorClick}
               target={blank ? "_blank" : "_self"}
               className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
               rel={blank ? "noopener noreferrer" : ""}
             >
-              {anchorText}
+              {blank ? "別タブで遷移" : "同一タブで遷移"}
             </a>
           </div>
         </div>
